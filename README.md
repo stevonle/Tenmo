@@ -20,39 +20,38 @@ You should attempt to complete all of the following required use cases.
    1. The new account has an initial balance of $1000.
    2. Account ids start at 2001.
 4. As an authenticated user of the system, I need to be able to see my Account Balance.
-5. As an authenticated user of the system, I need to be able to *send* a transfer of a specific amount of TE Bucks to a registered user.
+5. As an authenticated user of the system, I need to be able to *send* a transaction of a specific amount of TE Bucks to a registered user.
    1. I should be able to choose from a list of users to send TE Bucks to.
    2. I must not be allowed to send money to myself.
-   3. A transfer includes the User IDs of the from and to users and the amount of TE Bucks.
-   4. The receiver's account balance is increased by the amount of the transfer.
-   5. The sender's account balance is decreased by the amount of the transfer.
+   3. A transaction includes the User IDs of the from and to users and the amount of TE Bucks.
+   4. The receiver's account balance is increased by the amount of the transaction.
+   5. The sender's account balance is decreased by the amount of the transaction.
    6. I can't send more TE Bucks than I have in my account.
    7. I can't send a zero or negative amount.
    8. A Sending Transfer has an initial status of *Approved*.
-   9. Transfer ids start at 3001.
-6. As an authenticated user of the system, I need to be able to see transfers I have sent or received.
-7. As an authenticated user of the system, I need to be able to retrieve the details of any transfer based upon the transfer ID.
+   9. Transaction ids start at 3001.
+6. As an authenticated user of the system, I need to be able to see transactions I have sent or received.
+7. As an authenticated user of the system, I need to be able to retrieve the details of any transaction based upon the transaction ID.
 
 Validate all of the API's endpoints using Postman.  *No sensitive information (i.e. account numbers, user ids, etc) should be passed in the URL.*  Integration testing is required on each method that connects to the database -- remember WET!  Write everything at least twice!
 
 ###  Challenge use cases
 
-8. As an authenticated user of the system, I need to be able to *request* a transfer of a specific amount of TE Bucks from another registered user.
+8. As an authenticated user of the system, I need to be able to *request* a transaction of a specific amount of TE Bucks from another registered user.
    1. I should be able to choose from a list of users to request TE Bucks from.
    2. I must not be allowed to request money from myself.
    3. I can't request a zero or negative amount.
-   4. A transfer includes the User IDs of the from and to users and the amount of TE Bucks.
+   4. A transaction includes the User IDs of the from and to users and the amount of TE Bucks.
    5. A Request Transfer has an initial status of *Pending*.
    6. No account balance changes until the request is approved.
-   7. The transfer request should appear in both users' list of transfers (use case #5).
-9.  As an authenticated user of the system, I need to be able to see my *Pending* transfers.
+   7. The transaction request should appear in both users' list of transactions (use case #5).
+9.  As an authenticated user of the system, I need to be able to see my *Pending* transactions.
 10. As an authenticated user of the system, I need to be able to either approve or reject a Request Transfer.
    8. I can't "approve" a given Request Transfer for more TE Bucks than I have in my account.
    9. The Request Transfer status is *Approved* if I approve, or *Rejected* if I reject the request.
-   10. If the transfer is approved, the requester's account balance is increased by the amount of the request.
-   11. If the transfer is approved, the requestee's account balance is decreased by the amount of the request.
-   12. If the transfer is rejected, no account balance changes.
-   13. A single TEnmo user may choose to have multiple accounts associated with them (this will make the database relationship a one-to many relationship).
+   10. If the transaction is approved, the requester's account balance is increased by the amount of the request.
+   11. If the transaction is approved, the requestee's account balance is decreased by the amount of the request.
+   12. If the transaction is rejected, no account balance changes.
 
 ### Bonus Challenge
 
