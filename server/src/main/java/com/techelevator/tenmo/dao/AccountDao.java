@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface AccountDao {
     List<Integer> listAccountId();
-    BigDecimal findBalanceByAccountId(String username);
     boolean updateSenderBalance(int senderId, BigDecimal amount);
     boolean updateReceiverBalance(int receiverId, BigDecimal amount);
+    Account getAccountDetails(String username);
 }

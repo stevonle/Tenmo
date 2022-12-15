@@ -20,48 +20,21 @@ import java.util.List;
 @RestController
 @PreAuthorize("isAuthenticated()")
 public class TenmoController {
-    private AccountDao accountDao;
-    private TransactionDao transactionDao;
-    private UserDao userDao;
-    private TransactionCheckerInterface transactionChecker;
+    //ADD METHOD TO GET ACCOUNT INFO
 
-    public TenmoController(AccountDao accountDao, TransactionDao transactionDao, UserDao userDao, TransactionCheckerInterface transactionChecker) {
+    private AccountDao accountDao;
+
+    public TenmoController(AccountDao accountDao) {
         this.accountDao = accountDao;
-        this.transactionDao = transactionDao;
-        this.userDao = userDao;
-        this.transactionChecker = transactionChecker;
+    }
+
+    @RequestMapping(path = "/account/details", method = RequestMethod.GET)
+    public Account account(Principal principal) {
+        return accountDao.getAccountDetails(principal.getName());
     }
 
     @RequestMapping(path = "/accounts", method = RequestMethod.GET)
     public List<Integer> accounts() {
         return accountDao.listAccountId();
-    }
-
-    @RequestMapping(path = "/balance", method = RequestMethod.GET)
-    public BigDecimal getBalance(Principal principal) {
-        return accountDao.findBalanceByAccountId(principal.getName());
-    }
-
-    @RequestMapping(path = "/transactions", method = RequestMethod.GET)
-    public List<Integer> getTransactions() {
-        return transactionDao.findAllTransactions();
-    }
-
-    @RequestMapping(path = "/transaction/{id}", method = RequestMethod.GET)
-    public Transaction getTransactionById(@PathVariable int id) {
-        return transactionDao.findByTransactionId(id);
-    }
-
-    @ResponseStatus(code = HttpStatus.ACCEPTED, reason = "Approved")
-    @RequestMapping(path = "/send", method = RequestMethod.POST)
-    public boolean makeATransaction(@Valid @RequestBody Transaction newTransaction, Principal principal) {
-        if (transactionChecker.sufficientBalance(principal.getName(), newTransaction)) {
-            Transaction transaction = transactionDao.createTransaction(newTransaction);
-            accountDao.updateReceiverBalance(transaction.getReceiverId(), transaction.getAmount());
-            accountDao.updateSenderBalance(transaction.getSenderId(), transaction.getAmount());
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Insufficient funds");
-        }
-        return true;
     }
 }

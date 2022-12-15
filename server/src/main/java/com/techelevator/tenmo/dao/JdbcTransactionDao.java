@@ -2,9 +2,11 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transaction;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,24 +21,31 @@ public class JdbcTransactionDao implements TransactionDao{
     }
 
     @Override
-    public List<Integer> findAllTransactions() {
-        List<Integer> transactions = new ArrayList<>();
+    public List<Transaction> findAllTransactions(String username) {
+        List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT transaction_id, sender_id, receiver_id, amount " +
-                     "FROM transaction;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+                     "FROM transaction " +
+                     "JOIN account ON account.account_id = transaction.sender_id " +
+                     "OR account.account_id = transaction.receiver_id " +
+                     "JOIN tenmo_user ON tenmo_user.user_id = account.user_id " +
+                     "WHERE username ILIKE ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
         while(results.next()) {
             Transaction transaction = mapRowToTransaction(results);
-            transactions.add(transaction.getTransactionId());
+            transactions.add(transaction);
         }
         return transactions;
     }
 
     @Override
-    public Transaction findByTransactionId(int id) {
+    public Transaction findByTransactionId(int id, String username) {
         Transaction transaction = null;
-        String sql = "SELECT transaction_id, sender_id, receiver_id, amount " +
-                     "FROM transaction WHERE transaction_id = ?;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
+        String sql = "SELECT transaction_id, sender_id, receiver_id, amount FROM transaction " +
+                     "JOIN account ON transaction.sender_id = account.account_id " +
+                     "OR transaction.receiver_id = account.account_id " +
+                     "JOIN tenmo_user ON tenmo_user.user_id = account.user_id " +
+                     "WHERE transaction_id = ? AND username ILIKE ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id, username);
         if (results.next()) {
             transaction = mapRowToTransaction(results);
         }
@@ -45,17 +54,18 @@ public class JdbcTransactionDao implements TransactionDao{
 
     @Override
     public Transaction createTransaction(Transaction transaction) {
-        Transaction anotherTransaction = null;
+        Transaction createdTransaction = null;
         String sql = "INSERT INTO transaction (sender_id, receiver_id, amount) " +
                 "VALUES (?, ?, ?) RETURNING transaction_id;";
-        int newTransactionId = jdbcTemplate.queryForObject(sql, Integer.class, transaction.getSenderId(), transaction.getReceiverId(), transaction.getAmount());
+        int newTransactionId = jdbcTemplate.queryForObject(sql, Integer.class,
+                transaction.getSenderId(), transaction.getReceiverId(), transaction.getAmount());
         sql = "SELECT transaction_id, sender_id, receiver_id, amount FROM transaction " +
                 "WHERE transaction_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, newTransactionId);
         if (results.next()) {
-            anotherTransaction = mapRowToTransaction(results);
+            createdTransaction = mapRowToTransaction(results);
         }
-        return anotherTransaction;
+        return createdTransaction;
     }
 
     private Transaction mapRowToTransaction(SqlRowSet rs) {

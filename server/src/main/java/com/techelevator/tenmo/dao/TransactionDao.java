@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface TransactionDao {
-    List<Integer> findAllTransactions();
+    List<Transaction> findAllTransactions(String username);
     Transaction createTransaction(Transaction transaction);
-    Transaction findByTransactionId(int id);
+    Transaction findByTransactionId(int id, String username);
 }
