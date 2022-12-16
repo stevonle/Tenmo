@@ -13,6 +13,8 @@ public class Transaction {
     private int receiverId;
     @DecimalMin(value = "1.00", message = "Amount cannot be 0 or less")
     private BigDecimal amount;
+    private boolean pending;
+    private boolean approved;
 
     public Transaction() {}
 
@@ -21,6 +23,8 @@ public class Transaction {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.amount = amount;
+        this.pending = false;
+        this.approved = true;
     }
 
     public int getTransactionId() {
@@ -53,5 +57,21 @@ public class Transaction {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public boolean isPending() {
+        return pending;
+    }
+
+    public void setPending(boolean pending) {
+        this.pending = pending;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 }

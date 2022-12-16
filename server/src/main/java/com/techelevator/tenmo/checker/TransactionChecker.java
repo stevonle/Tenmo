@@ -2,9 +2,11 @@ package com.techelevator.tenmo.checker;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transaction;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,10 @@ public class TransactionChecker implements TransactionCheckerInterface{
         if (results.next()) {
             account = mapRowToAccount(results);
         }
-        return (account.getBalance().compareTo(newTransaction.getAmount()) > -1);
+        if (account.getBalance().compareTo(newTransaction.getAmount()) > -1) {
+            return true;
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Insufficient funds");
     }
 
     @Override
@@ -36,7 +41,7 @@ public class TransactionChecker implements TransactionCheckerInterface{
         if (newTransaction.getReceiverId() != newTransaction.getSenderId()) {
             return true;
         }
-        return false;
+        throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Can't send funds to self");
     }
 
     @Override
@@ -54,7 +59,7 @@ public class TransactionChecker implements TransactionCheckerInterface{
                 return false;
             }
         }
-        return true;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Recipient ID found");
     }
 
     @Override
@@ -70,7 +75,7 @@ public class TransactionChecker implements TransactionCheckerInterface{
         if (account.getAccountId() == transaction.getSenderId()) {
             return false;
         }
-        return true;
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Sender ID");
     }
 
     private Account mapRowToAccount(SqlRowSet rs) {

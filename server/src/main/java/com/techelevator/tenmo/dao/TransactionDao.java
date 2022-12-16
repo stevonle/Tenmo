@@ -9,4 +9,6 @@ public interface TransactionDao {
     List<Transaction> findAllTransactions(String username);
     Transaction createTransaction(Transaction transaction);
     Transaction findByTransactionId(int id, String username);
+    boolean requestTransaction(Transaction tran);
+    List<Transaction> pendingTransactions(String username);
 }

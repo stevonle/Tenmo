@@ -43,10 +43,10 @@ public class TransactionController {
     @ResponseStatus(code = HttpStatus.ACCEPTED, reason = "Approved")
     @RequestMapping(path = "/send", method = RequestMethod.POST)
     public boolean makeATransaction(@Valid @RequestBody Transaction newTran, Principal principal) {
-        receiverIdCheck(newTran);
-        senderIdCheck(principal, newTran);
-        balanceCheck(principal, newTran);
-        recipientNotSenderIdCheck(newTran);
+        transactionChecker.wrongReceiverId(newTran);
+        transactionChecker.wrongSenderId(principal.getName(), newTran);
+        transactionChecker.sufficientBalance(principal.getName(), newTran);
+        transactionChecker.notMyAccount(newTran);
 
         Transaction tran = transactionDao.createTransaction(newTran);
         accountDao.updateReceiverBalance(tran.getReceiverId(), tran.getAmount());
@@ -54,27 +54,19 @@ public class TransactionController {
         return true;
     }
 
-    private void receiverIdCheck(Transaction newTran) {
-        if (transactionChecker.wrongReceiverId(newTran)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Recipient ID found");
-        }
+    @ResponseStatus(code = HttpStatus.CREATED, reason = "Pending")
+    @RequestMapping(path = "/request", method = RequestMethod.POST)
+    public boolean requestATransaction(@Valid @RequestBody Transaction newTran, Principal principal) {
+        transactionChecker.wrongReceiverId(newTran);
+        transactionChecker.wrongSenderId(principal.getName(), newTran);
+        transactionChecker.notMyAccount(newTran);
+
+        return transactionDao.requestTransaction(newTran);
     }
 
-    private void senderIdCheck(Principal principal, Transaction newTran) {
-        if (transactionChecker.wrongSenderId(principal.getName(), newTran)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Sender ID");
-        }
+    @RequestMapping(path = "/pending_transactions", method = RequestMethod.GET)
+    public List<Transaction> listPendingTransactions(Principal principal) {
+        return transactionDao.pendingTransactions(principal.getName());
     }
 
-    private void balanceCheck(Principal principal, Transaction newTran) {
-        if (!transactionChecker.sufficientBalance(principal.getName(), newTran)) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Insufficient funds");
-        }
-    }
-
-    private void recipientNotSenderIdCheck(Transaction newTran) {
-        if (!transactionChecker.notMyAccount(newTran)) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Can't send funds to self");
-        }
-    }
 }
