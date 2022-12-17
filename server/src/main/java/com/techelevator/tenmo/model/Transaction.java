@@ -3,28 +3,28 @@ package com.techelevator.tenmo.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 
 public class Transaction {
+    @JsonProperty("transaction_id")
     private int transactionId;
     @JsonProperty("sender_id")
     private int senderId;
     @JsonProperty("receiver_id")
     private int receiverId;
-    @DecimalMin(value = "1.00", message = "Amount cannot be 0 or less")
+    @DecimalMin(value = "0.01", message = "Amount cannot be 0 or less")
     private BigDecimal amount;
-    private boolean pending;
-    private boolean approved;
+    private String status;
 
     public Transaction() {}
 
-    public Transaction(int transactionId, int senderId, int receiverId, BigDecimal amount) {
+    public Transaction(int transactionId, int senderId, int receiverId, BigDecimal amount, String status) {
         this.transactionId = transactionId;
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.amount = amount;
-        this.pending = false;
-        this.approved = true;
+        this.status = status;
     }
 
     public int getTransactionId() {
@@ -59,19 +59,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public boolean isPending() {
-        return pending;
+    public String getStatus() {
+        return status;
     }
 
-    public void setPending(boolean pending) {
-        this.pending = pending;
-    }
-
-    public boolean isApproved() {
-        return approved;
-    }
-
-    public void setApproved(boolean approved) {
-        this.approved = approved;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

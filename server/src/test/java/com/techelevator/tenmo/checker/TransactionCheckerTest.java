@@ -6,22 +6,19 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 
 import static org.junit.Assert.*;
 
 public class TransactionCheckerTest extends BaseDaoTests {
-    private static final Transaction NEW_TRANSACTION_1 = new Transaction(3004,
-            2001, 2002, BigDecimal.valueOf(100.00));
-    private static final Transaction NEW_TRANSACTION_2 = new Transaction(3004,
-            2001, 2002, BigDecimal.valueOf(900.00));
-    private static final Transaction NEW_TRANSACTION_3 = new Transaction(3004,
-            2001, 2001, BigDecimal.valueOf(100.00));
-    private static final Transaction NEW_TRANSACTION_4 = new Transaction(3004,
-            2001, 2003, BigDecimal.valueOf(100.00));
-    private static final Transaction NEW_TRANSACTION_5 = new Transaction(3004,
-            2003, 2002, BigDecimal.valueOf(100.00));
+    private static final Transaction NEW_TRANSACTION_1 = new Transaction(3006,
+            2001, 2002, BigDecimal.valueOf(100.00), "pending");
+    private static final Transaction NEW_TRANSACTION_2 = new Transaction(3006,
+            2001, 2001, BigDecimal.valueOf(100.00), "pending");
+    private static final Transaction TRANSACTION_1 = new Transaction(3002,
+            2002, 2001, BigDecimal.valueOf(250.00), "pending");
 
     private TransactionChecker sut;
 
@@ -38,45 +35,38 @@ public class TransactionCheckerTest extends BaseDaoTests {
     }
 
     @Test
-    public void sufficientBalance_fails_check() {
-        boolean actualValue = sut.sufficientBalance("bob", NEW_TRANSACTION_2);
-        Assert.assertFalse(actualValue);
-    }
-
-    @Test
     public void notMyAccount_passes_check() {
-        boolean actualValue = sut.notMyAccount(NEW_TRANSACTION_1);
+        boolean actualValue = sut.validIds(NEW_TRANSACTION_1);
         Assert.assertTrue(actualValue);
     }
 
     @Test
-    public void notMyAccount_fails_check() {
-        boolean actualValue = sut.notMyAccount(NEW_TRANSACTION_3);
+    public void createReceiverId_passes_check() {
+        boolean actualValue = sut.createReceiverId(NEW_TRANSACTION_1);
         Assert.assertFalse(actualValue);
     }
 
     @Test
-    public void wrongReceiverId_passes_check() {
-        boolean actualValue = sut.wrongReceiverId(NEW_TRANSACTION_1);
+    public void createSenderId_passes_check() {
+        boolean actualValue = sut.createSenderId("bob", NEW_TRANSACTION_1);
         Assert.assertFalse(actualValue);
     }
 
     @Test
-    public void wrongReceiverId_fails_check() {
-        boolean actualValue = sut.wrongReceiverId(NEW_TRANSACTION_4);
+    public void requestReceiverId_passes_check() {
+        boolean actualValue = sut.requestReceiverId("bob", NEW_TRANSACTION_2);
+        Assert.assertFalse(actualValue);
+    }
+
+    @Test
+    public void requestSenderId_passes_check() {
+        boolean actualValue = sut.requestSenderId(NEW_TRANSACTION_2);
+        Assert.assertFalse(actualValue);
+    }
+
+    @Test
+    public void pendingStatus_passes_check() {
+        boolean actualValue = sut.pendingStatus(TRANSACTION_1);
         Assert.assertTrue(actualValue);
     }
-
-    @Test
-    public void wrongSenderId_passes_check() {
-        boolean actualValue = sut.wrongSenderId("bob", NEW_TRANSACTION_1);
-        Assert.assertFalse(actualValue);
-    }
-
-    @Test
-    public void wrongSenderId_fails_check() {
-        boolean actualValue = sut.wrongSenderId("bob", NEW_TRANSACTION_1);
-        Assert.assertFalse(actualValue);
-    }
-
 }

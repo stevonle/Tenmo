@@ -14,9 +14,9 @@ import static org.junit.Assert.*;
 
 public class JdbcAccountDaoTest extends BaseDaoTests {
     private static final Account ACCOUNT_1 = new Account(2001,
-            1001, BigDecimal.valueOf(850.00));
+            1001, BigDecimal.valueOf(550.00));
     private static final Account ACCOUNT_2 = new Account(2002,
-            1002, BigDecimal.valueOf(1150.00));
+            1002, BigDecimal.valueOf(1450.00));
 
     private JdbcAccountDao sut;
 
@@ -69,28 +69,28 @@ public class JdbcAccountDaoTest extends BaseDaoTests {
     public void updateSenderBalance_subtracts_from_bobs_balance() {
         sut.updateSenderBalance(2001, BigDecimal.valueOf(100.00));
         BigDecimal actualBalance = sut.getAccountDetails("bob").getBalance();
-        Assert.assertTrue(BigDecimal.valueOf(750.00).compareTo(actualBalance) == 0);
+        Assert.assertTrue(BigDecimal.valueOf(450.00).compareTo(actualBalance) == 0);
     }
 
     @Test
     public void updateSenderBalance_subtracts_from_users_balance() {
         sut.updateSenderBalance(2002, BigDecimal.valueOf(250.00));
         BigDecimal actualBalance = sut.getAccountDetails("user").getBalance();
-        Assert.assertTrue(BigDecimal.valueOf(900.00).compareTo(actualBalance) == 0);
+        Assert.assertTrue(BigDecimal.valueOf(1200.00).compareTo(actualBalance) == 0);
     }
 
     @Test
     public void updateReceiverBalance_adds_to_bobs_balance() {
         sut.updateReceiverBalance(2001, BigDecimal.valueOf(50.50));
         BigDecimal actualBalance = sut.getAccountDetails("bob").getBalance();
-        Assert.assertTrue(BigDecimal.valueOf(900.50).compareTo(actualBalance) == 0);
+        Assert.assertTrue(BigDecimal.valueOf(600.50).compareTo(actualBalance) == 0);
     }
 
     @Test
     public void updateReceiverBalance_adds_to_users_balance() {
         sut.updateReceiverBalance(2002, BigDecimal.valueOf(600.50));
         BigDecimal actualBalance = sut.getAccountDetails("user").getBalance();
-        Assert.assertTrue(BigDecimal.valueOf(1750.50).compareTo(actualBalance) == 0);
+        Assert.assertTrue(BigDecimal.valueOf(2050.50).compareTo(actualBalance) == 0);
     }
 
     private void assertAccountsMatch(Account expected, Account actual) {

@@ -11,4 +11,6 @@ public interface TransactionDao {
     Transaction findByTransactionId(int id, String username);
     boolean requestTransaction(Transaction tran);
     List<Transaction> pendingTransactions(String username);
+    boolean approveTransaction(Transaction tran, String username);
+    public boolean rejectTransaction(Transaction tran, String username);
 }

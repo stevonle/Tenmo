@@ -43,6 +43,7 @@ CREATE TABLE transaction (
 	sender_id int NOT NULL,
 	receiver_id int NOT NULL,
 	amount numeric(13,2) NOT NULL,
+	status varchar(10) NOT NULL,
 	CONSTRAINT PK_transaction PRIMARY KEY (transaction_id),
 	CONSTRAINT FK_transaction_sender_account FOREIGN KEY (sender_id) REFERENCES account (account_id),
 	CONSTRAINT FK_transaction_receiver_account FOREIGN KEY (receiver_id) REFERENCES account (account_id)
